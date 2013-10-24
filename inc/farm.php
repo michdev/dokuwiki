@@ -22,6 +22,9 @@
  * @license GPL 2 (http://www.gnu.org/licenses/gpl.html)
  */
 
+// Save custom DOKU_CONF if defined in preload.php (conf dir security)
+if(defined('DOKU_CONF')) define('DOKU_CUSTOM_CONF', DOKU_CONF);
+
 // DOKU_FARMDIR needs to be set in preload.php, here the fallback is the same as DOKU_INC would be (if it was set already)
 if(!defined('DOKU_FARMDIR')) define('DOKU_FARMDIR', fullpath(dirname(__FILE__).'/../').'/');
 if(!defined('DOKU_CONF')) define('DOKU_CONF', farm_confpath(DOKU_FARMDIR));
@@ -74,75 +77,87 @@ function farm_confpath($farm) {
         return "$farm/default/conf/";
     }
     // farmer
+    if(defined('DOKU_CUSTOM_CONF'))
+        return('DOKU_CUSTOM_CONF');
+        
     return DOKU_INC.'conf/';
 }
+
+// default config files for dokuwiki
+if(defined('DOKU_CUSTOM_CONF'))
+    $default_conf = DOKU_CUST_CONF;
+else
+    $default_conf = DOKU_CONF;
+
+// config file for farmer and animals
+$local_conf = farm_confpath(DOKU_FARMDIR);
 
 /* Use default config files and local animal config files */
 $config_cascade = array(
     'main' => array(
-        'default'   => array(DOKU_INC.'conf/dokuwiki.php'),
-        'local'     => array(DOKU_CONF.'local.php'),
-        'protected' => array(DOKU_CONF.'local.protected.php'),
+        'default' => array($default_conf.'dokuwiki.php'),
+        'local' => array($local_conf.'local.php'),
+        'protected' => array($local_conf.'local.protected.php'),
     ),
-    'acronyms'  => array(
-        'default'   => array(DOKU_INC.'conf/acronyms.conf'),
-        'local'     => array(DOKU_CONF.'acronyms.local.conf'),
+    'acronyms' => array(
+        'default' => array($default_conf.'acronyms.conf'),
+        'local' => array($local_conf.'acronyms.local.conf'),
     ),
-    'entities'  => array(
-        'default'   => array(DOKU_INC.'conf/entities.conf'),
-        'local'     => array(DOKU_CONF.'entities.local.conf'),
+    'entities' => array(
+        'default' => array($default_conf.'entities.conf'),
+        'local' => array($local_conf.'entities.local.conf'),
     ),
     'interwiki' => array(
-        'default'   => array(DOKU_INC.'conf/interwiki.conf'),
-        'local'     => array(DOKU_CONF.'interwiki.local.conf'),
+        'default' => array($default_conf.'interwiki.conf'),
+        'local' => array($local_conf.'interwiki.local.conf'),
     ),
     'license' => array(
-        'default'   => array(DOKU_INC.'conf/license.php'),
-        'local'     => array(DOKU_CONF.'license.local.php'),
+        'default' => array($default_conf.'license.php'),
+        'local' => array($local_conf.'license.local.php'),
     ),
     'mediameta' => array(
-        'default'   => array(DOKU_INC.'conf/mediameta.php'),
-        'local'     => array(DOKU_CONF.'mediameta.local.php'),
+        'default' => array($default_conf.'mediameta.php'),
+        'local' => array($local_conf.'mediameta.local.php'),
     ),
-    'mime'      => array(
-        'default'   => array(DOKU_INC.'conf/mime.conf'),
-        'local'     => array(DOKU_CONF.'mime.local.conf'),
+    'mime' => array(
+        'default' => array($default_conf.'mime.conf'),
+        'local' => array($local_conf.'mime.local.conf'),
     ),
-    'scheme'    => array(
-        'default'   => array(DOKU_INC.'conf/scheme.conf'),
-        'local'     => array(DOKU_CONF.'scheme.local.conf'),
+    'scheme' => array(
+        'default' => array($default_conf.'scheme.conf'),
+        'local' => array($local_conf.'scheme.local.conf'),
     ),
-    'smileys'   => array(
-        'default'   => array(DOKU_INC.'conf/smileys.conf'),
-        'local'     => array(DOKU_CONF.'smileys.local.conf'),
+    'smileys' => array(
+        'default' => array($default_conf.'smileys.conf'),
+        'local' => array($local_conf.'smileys.local.conf'),
     ),
     'wordblock' => array(
-        'default'   => array(DOKU_INC.'conf/wordblock.conf'),
-        'local'     => array(DOKU_CONF.'wordblock.local.conf'),
+        'default' => array($default_conf.'wordblock.conf'),
+        'local' => array($local_conf.'wordblock.local.conf'),
     ),
-    'acl'       => array(
-        'default'   => DOKU_CONF.'acl.auth.php',
+    'acl' => array(
+        'default' => $local_conf.'acl.auth.php',
     ),
     'plainauth.users' => array(
-        'default'   => DOKU_CONF.'users.auth.php',
+        'default' => $local_conf.'users.auth.php',
     ),
     'plugins' => array( // needed since Angua
-        'default'   => array(DOKU_INC.'conf/plugins.php'),
-        'local'     => array(DOKU_CONF.'plugins.local.php'),
+        'default' => array($default_conf.'plugins.php'),
+        'local' => array($local_conf.'plugins.local.php'),
         'protected' => array(
-            DOKU_INC.'conf/plugins.required.php',
-            DOKU_CONF.'plugins.protected.php',
+            $default_conf.'plugins.required.php',
+            $local_conf.'plugins.protected.php',
         ),
     ),
     'userstyle' => array(
-        'default' => DOKU_CONF.'userstyle.css', // 'default' was renamed to 'screen' on 2011-02-26, so will be deprecated in the next version
-        'screen'  => DOKU_CONF.'userstyle.css',
-        'rtl'     => DOKU_CONF.'userrtl.css', // deprecated since version after 2012-04-09
-        'print'   => DOKU_CONF.'userprint.css',
-        'feed'    => DOKU_CONF.'userfeed.css',
-        'all'     => DOKU_CONF.'userall.css',
+        'default' => $local_conf.'userstyle.css', // 'default' was renamed to 'screen' on 2011-02-26, so will be deprecated in the next version
+        'screen' => $local_conf.'userstyle.css',
+        'rtl' => $local_conf.'userrtl.css', // deprecated since version after 2012-04-09
+        'print' => $local_conf.'userprint.css',
+        'feed' => $local_conf.'userfeed.css',
+        'all' => $local_conf.'userall.css',
     ),
     'userscript' => array(
-        'default' => DOKU_CONF.'userscript.js'
+        'default' => $local_conf.'userscript.js'
     ),
 );
